@@ -6,9 +6,9 @@ const buttonBackspace = document.getElementById("btn-backspace");
 const buttonComma = document.getElementById("btn-comma");
 const buttonEqual = document.getElementById("btn-equal");
 
-let currentInput = "";
-const OPERATOR_SYMBOLS = "/*+-"
-const MAX_INPUT_LENGTH = 30;
+let currentInput = "0";
+const OPERATOR_SYMBOLS = "/*+-";
+// TO ADD:
 // ***MAKE DISPLAY TEXT FONT-SIZE SCALE BY TEXT LENGTH
 
 digitButtons.forEach((btn) => btn.addEventListener('click', appendDigit));
@@ -16,28 +16,37 @@ operatorButtons.forEach((btn) => btn.addEventListener('click', appendOperator));
 buttonBackspace.addEventListener('click', popInput);
 buttonCE.addEventListener('click', clearInput);
 buttonComma.addEventListener('click', appendComma);
+buttonEqual.addEventListener('click', operate);
 
 function updateDisplay(){
     displayText.textContent = currentInput.length > 0 ? currentInput.replaceAll("/", "÷") : "0";
 }
 
-function doesInputHaveSpace(){
-    return currentInput.length < MAX_INPUT_LENGTH;
-}
-
 function appendDigit(event){
     let digit = event.target.id.at(-1);
-    currentInput += digit;
+
+    if(currentInput == "0"){
+        // Dont allow multiple consecutive zeroes (unless after comma)
+        currentInput = digit;
+    }
+    else{
+        currentInput += digit;
+    }
     updateDisplay();
 }
 
 function appendOperator(event){
     if(currentInput.length <= 0)
         return;
-    
+
+    // if an operator exists and its not the last character, operate
+    if(currentInput.slice(0, -1).split('').some(char => OPERATOR_SYMBOLS.includes(char))){
+        operate();
+    }
+
     let operator = event.target.id.at(-1);
 
-    // if an operator is already selected, replace it
+    // if an operator is already the last character, replace it
     if(OPERATOR_SYMBOLS.includes(currentInput.at(-1)))
         currentInput = currentInput.slice(0,-1) + operator;
     else {
@@ -61,16 +70,65 @@ function clearInput(){
 }
 
 function appendComma(){
-    // dont allow comma after operator or comma
-    if(!OPERATOR_SYMBOLS.includes(currentInput.at(-1)) && currentInput.at(-1) !== "."){
-
-        // prohibit multiple commas per single number - check for operators after the last comma
-        let decimalSplit = currentInput.split('.')
-        if(decimalSplit.length > 1 && !decimalSplit[decimalSplit.length-1].split('').some(char => OPERATOR_SYMBOLS.includes(char))){
-            return;
-        }
-
+    if(!isDecimalInput()){
         currentInput += ".";
         updateDisplay();
     }
+}
+
+function operate(){
+    // TO ADD:
+    // allow to multiply and divide by negative numbers
+
+    if(currentInput.includes("/")){
+        numbers = currentInput.split("/");
+        // if only one number is entered, then operate against itself i.e. 5/=1
+        if(numbers[1] === "")
+            numbers[1] = numbers[0];
+
+        currentInput = (parseFloat(numbers[0]) / parseFloat(numbers[1])).toString();
+    }
+    else if(currentInput.includes("*")){
+        numbers = currentInput.split("*");
+
+        if(numbers[1] === "")
+            numbers[1] = numbers[0];
+
+        currentInput = (parseFloat(numbers[0]) * parseFloat(numbers[1])).toString();
+    }
+    else if(currentInput.includes("+")){
+        numbers = currentInput.split("+");
+
+        if(numbers[1] === "")
+            numbers[1] = numbers[0];
+
+        currentInput = (parseFloat(numbers[0]) + parseFloat(numbers[1])).toString();
+    }
+    else if(currentInput.includes("-")){
+        numbers = currentInput.split("-");
+
+        if(numbers[1] === "")
+            numbers[1] = numbers[0];
+
+        currentInput = (parseFloat(numbers[0]) - parseFloat(numbers[1])).toString();
+    }
+    else{
+        return;
+    }
+
+    updateDisplay();
+}
+
+// check if comma exists
+// if it does, check if the last comma was not before an operator
+function isDecimalInput(){
+    if(currentInput.includes('.')){
+        // prohibit multiple commas per single number - check for operators after the last comma
+        let decimalSplit = currentInput.split('.')
+        if(!decimalSplit[decimalSplit.length-1].split('').some(char => OPERATOR_SYMBOLS.includes(char))){
+            return true;
+        }
+    }
+
+    return false;
 }
