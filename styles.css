@@ -6,6 +6,7 @@
 body {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: center;
     margin: 0;
     padding: 0;
@@ -15,6 +16,10 @@ body {
 
 h1 {
     color: white;
+}
+
+h1 span {
+    color: rgb(180, 228, 255);
 }
 
 #main-container {
@@ -102,4 +107,15 @@ button {
 #btn-equal {
     background-color: rgb(10, 78, 167);
     color: white;
+}
+
+#footer {
+    color: lightgray;
+
+    font-size: 14px;
+    padding: 16px;
+}
+
+#footer a {
+    color: rgb(180, 228, 255);
 }
