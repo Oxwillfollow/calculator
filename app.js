@@ -7,7 +7,7 @@ const buttonComma = document.getElementById("btn-comma");
 const buttonEqual = document.getElementById("btn-equal");
 
 let currentInput = "0";
-const OPERATOR_SYMBOLS = "/*+-";
+const OPERATOR_SYMBOLS = ['/','*','+','-'];
 
 digitButtons.forEach((btn) => btn.addEventListener('click', appendDigit));
 operatorButtons.forEach((btn) => btn.addEventListener('click', appendOperator));
@@ -52,7 +52,7 @@ function appendDigit(event){
 
 function appendOperator(event){
     // if an operator exists and its not the last character, operate
-    if(!OPERATOR_SYMBOLS.includes(currentInput.at(-1)) && currentInput.slice(0, -1).split('').some(char => OPERATOR_SYMBOLS.includes(char))){
+    if(currentInput.slice(1, -1).split('').some(char => OPERATOR_SYMBOLS.includes(char))){
         operate();
     }
 
@@ -69,10 +69,15 @@ function appendOperator(event){
 }
 
 function popInput(){
-    if(currentInput){
+    if(currentInput == "NaN")
+        clearInput();
+
+    if(currentInput.length == 1 || currentInput.length == 2 && currentInput[0] == "-")
+        currentInput = "0";
+    else
         currentInput = currentInput.slice(0,-1);
-        updateDisplay();
-    }
+
+    updateDisplay();
 }
 
 function clearInput(){
@@ -90,42 +95,35 @@ function appendComma(){
 }
 
 function operate(){
-    if(currentInput.includes("/")){
-        numbers = currentInput.split("/");
-        // if only one number is entered, then operate against itself i.e. 5/=1
-        if(numbers[1] === "")
-            numbers[1] = numbers[0];
+    // finds the last operator (to not take "-" from negative numbers)
+    let operator = currentInput.split('').reverse().find(char => OPERATOR_SYMBOLS.includes(char));
 
-        currentInput = (parseFloat(numbers[0]) / parseFloat(numbers[1])).toString();
-    }
-    else if(currentInput.includes("*")){
-        numbers = currentInput.split("*");
+    if(!operator) return;
 
-        if(numbers[1] === "")
-            numbers[1] = numbers[0];
+    entries = currentInput.split(operator);
+    // if only one number is entered, then operate against itself i.e. 5/=1
+    if(entries[1] === "")
+        entries[1] = entries[0];
 
-        currentInput = (parseFloat(numbers[0]) * parseFloat(numbers[1])).toString();
-    }
-    else if(currentInput.includes("+")){
-        numbers = currentInput.split("+");
+    let num1 = parseFloat(entries[0]);
+    let num2 = parseFloat(entries[1]);
 
-        if(numbers[1] === "")
-            numbers[1] = numbers[0];
-
-        currentInput = (parseFloat(numbers[0]) + parseFloat(numbers[1])).toString();
-    }
-    else if(currentInput.includes("-")){
-        numbers = currentInput.split("-");
-
-        if(numbers[1] === "")
-            numbers[1] = numbers[0];
-
-        currentInput = (parseFloat(numbers[0]) - parseFloat(numbers[1])).toString();
-    }
-    else{
-        return;
-    }
-
+    switch(operator){
+        case "/":
+            currentInput = (num1 / num2).toString();
+            break;
+        case "*":
+            currentInput = (num1 * num2).toString();
+            break;
+        case "+":
+            currentInput = (num1 + num2).toString();
+            break;
+        case "-":
+            currentInput = (num1 - num2).toString();
+            break;
+        default:
+            break;
+    } 
     updateDisplay();
 }
 
