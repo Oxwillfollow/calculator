@@ -7,6 +7,7 @@ const buttonComma = document.getElementById("btn-comma");
 const buttonEqual = document.getElementById("btn-equal");
 
 let currentInput = "0";
+const MAX_INPUT_LENGTH = 50;
 const OPERATOR_SYMBOLS = ['/','*','+','-'];
 
 digitButtons.forEach((btn) => btn.addEventListener('click', appendDigit));
@@ -39,6 +40,8 @@ function updateDisplay(){
 }
 
 function appendDigit(event){
+    if(currentInput.length >= MAX_INPUT_LENGTH) return;
+
     let digit = event.target.id.at(-1);
 
     if(currentInput == "0"){
@@ -51,6 +54,8 @@ function appendDigit(event){
 }
 
 function appendOperator(event){
+    if(currentInput.length >= MAX_INPUT_LENGTH) return;
+    
     // if an operator exists and its not the last character, operate
     if(currentInput.slice(1, -1).split('').some(char => OPERATOR_SYMBOLS.includes(char))){
         operate();
