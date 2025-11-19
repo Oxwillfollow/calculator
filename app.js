@@ -55,6 +55,12 @@ function appendDigit(event){
 
 function appendOperator(event){
     if(currentInput.length >= MAX_INPUT_LENGTH) return;
+
+    if(currentInput.includes('e')){
+        currentInput = "NaN";
+        updateDisplay();
+        return;
+    }
     
     // if an operator exists and its not the last character, operate
     if(currentInput.slice(1, -1).split('').some(char => OPERATOR_SYMBOLS.includes(char))){
