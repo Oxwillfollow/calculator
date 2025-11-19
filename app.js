@@ -19,7 +19,7 @@ buttonEqual.addEventListener('click', operate);
 function updateDisplay(){
     displayText.textContent = currentInput.length > 0 ? currentInput.replaceAll("/", "÷") : "0";
 
-    // change font size based on input length
+    // change font size based on input length to fit more characters
     let dynamicFontSizes = [48, 36, 26, 20];
 
     if(currentInput.length > 18){
@@ -51,22 +51,20 @@ function appendDigit(event){
 }
 
 function appendOperator(event){
-    if(currentInput.length <= 0)
-        return;
-
     // if an operator exists and its not the last character, operate
-    if(currentInput.slice(0, -1).split('').some(char => OPERATOR_SYMBOLS.includes(char))){
+    if(!OPERATOR_SYMBOLS.includes(currentInput.at(-1)) && currentInput.slice(0, -1).split('').some(char => OPERATOR_SYMBOLS.includes(char))){
         operate();
     }
 
     let operator = event.target.id.at(-1);
 
-    // if an operator is already the last character, replace it
-    if(OPERATOR_SYMBOLS.includes(currentInput.at(-1)))
+    if(OPERATOR_SYMBOLS.includes(currentInput.at(-1))){
         currentInput = currentInput.slice(0,-1) + operator;
+    }
     else {
         currentInput += operator;
     }
+
     updateDisplay();
 }
 
@@ -79,7 +77,7 @@ function popInput(){
 
 function clearInput(){
     if(currentInput){
-        currentInput = "";
+        currentInput = "0";
         updateDisplay();
     }
 }
@@ -92,9 +90,6 @@ function appendComma(){
 }
 
 function operate(){
-    // TO ADD:
-    // allow to multiply and divide by negative numbers
-
     if(currentInput.includes("/")){
         numbers = currentInput.split("/");
         // if only one number is entered, then operate against itself i.e. 5/=1
@@ -136,8 +131,9 @@ function operate(){
 
 function isDecimalInput(){
     if(currentInput.includes('.')){
-        // prohibit multiple commas per single number - check for operators after the last comma
         let decimalSplit = currentInput.split('.')
+
+        // if there are no operators after the last comma, we are in the decimal
         if(!decimalSplit[decimalSplit.length-1].split('').some(char => OPERATOR_SYMBOLS.includes(char))){
             return true;
         }

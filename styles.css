@@ -98,6 +98,15 @@ button {
     border: 0;
     border-radius: 8px;
     flex-basis: 32px;
+    background-color: aliceblue;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:active {
+    opacity: 0.8;
 }
 
 #btn0 {
